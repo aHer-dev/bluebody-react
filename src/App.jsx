@@ -1,20 +1,22 @@
-// Wir importieren unsere neue Komponente SetUI
-import SetUI from "./components/SetUI";
+import React from "react";
+import { Canvas } from "@react-three/fiber";
+import ModelViewer from "./components/ModelViewer";
 
-// Hauptkomponente der App – hier binden wir SetUI in das Hauptlayout ein
-function App() {
+export default function App() {
   return (
-    <main className="grid place-items-center min-h-screen bg-background text-white p-4">
-      <div className="space-y-8">
-        {/* Titel */}
-        <h1 className="text-3xl font-bold text-accent">BlueBody 3D</h1>
-
-        {/* Hier erscheint die Sammlungskomponente */}
-        <SetUI />
-      </div>
-    </main>
+    <div
+      className="bg-ui-bg text-white"
+      style={{ width: "100vw", height: "100vh", position: "relative" }}
+    >
+      <Canvas
+        camera={{ position: [0, 0, 5], fov: 45 }}
+        style={{ width: "100%", height: "100%" }}
+        onCreated={() => console.log("🎥 Canvas erstellt")}
+      >
+        <ambientLight intensity={1} />
+        <directionalLight position={[5, 5, 5]} intensity={1} />
+        <ModelViewer url="/models/test/FJ1383.glb" />
+      </Canvas>
+    </div>
   );
 }
-
-// Export – notwendig, damit Vite/React diese Komponente lädt
-export default App;
