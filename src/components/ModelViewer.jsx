@@ -15,7 +15,11 @@ export default function ModelViewer({ url }) {
   });
 
   console.log("✅ Modell geladen:", gltf);
-
+    
+  useEffect(() => {
+        console.log("📥 Lade Modell aus:", url);
+    }, [url]);
+    
   return (
     <>
       <OrbitControls />

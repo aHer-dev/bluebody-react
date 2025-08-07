@@ -1,37 +1,44 @@
+
+// JSON LISTEN WORKAROUND PRÜFEN !!! DOPPELTE EIONTRÄGE ?!
+// src/components/BentoGrid.jsx
 import React from "react";
 
 export default function BentoGrid({ metaData, selectedGroup, onClickEntry }) {
-  // 🆕 Filter-Logik ausgelagert vor JSX
-  const filtered =
-    selectedGroup === "all"
-      ? metaData
-      : metaData.filter(
-          (entry) => entry.classification?.group === selectedGroup
+
+    const filteredData = metaData.filter(entry =>
+        entry.classification?.group === selectedGroup
+    );
+
+    if (!selectedGroup || !metaData.length) {
+        return (
+            <div className="text-sm text-white/50 mt-4">
+                Bitte wähle eine Strukturgruppe.
+            </div>
         );
+    }
+    console.log("🧩 Grid-Daten:", filteredData);
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-      {filtered.map((entry, index) => (
-        <div
-          key={`${entry.id}-${entry.model?.filename || index}`} // Eindeutiger Key
-          onClick={() => onClickEntry(entry)}
-          className="bg-white/5 backdrop-blur-md 
-                     border border-white/10 rounded-xl 
-                     p-4 text-white shadow 
-                     hover:scale-[1.02] transition-all 
-                     cursor-pointer"
-        >
-          <h3 className="text-md font-semibold text-blue-400">
-            {entry.labels?.en || "Unnamed"}
-          </h3>
-          <p className="text-sm text-gray-400 italic">
-            Gruppe: {entry.classification?.group || "?"}
-          </p>
-          <p className="text-xs mt-2 text-gray-300 truncate">
-            ID: {entry.id}
-          </p>
-        </div>
-      ))}
+    <div className="grid grid-cols-1 gap-3 mt-4">
+
+          {filteredData.map((entry, index) => (
+              <button
+                  key={`${entry.id}-${index}`}
+                  onClick={() => {
+                      console.log("✅ Klick auf:", entry);
+                      onClickEntry(entry);
+                  }}
+                  className="bg-white/5 hover:bg-white/10 p-3 rounded-xl text-left text-sm border border-white/10 transition"
+              >
+                  <div className="font-semibold text-brand-blue mb-1">
+                      {entry.labels?.en || entry.id}
+                  </div>
+                  <div className="text-white/60 text-xs">
+                      Gruppe: {entry.classification?.group || "–"}
+                  </div>
+                  <div className="text-white/30 text-xs">ID: {entry.id}</div>
+              </button>
+          ))}
     </div>
   );
 }

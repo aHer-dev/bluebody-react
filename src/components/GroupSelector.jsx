@@ -1,22 +1,42 @@
 // src/components/GroupSelector.jsx
-import React from "react";
-
-const groups = ["all", "muscles", "bones", "ligaments", "nerves", "organs"]; // kannst du später erweitern
+import React, { useEffect, useState } from "react";
 
 export default function GroupSelector({ selectedGroup, onSelectGroup }) {
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    fetch("/meta.json")
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("📦 meta.json geladen:", data.length, "Einträge");
+        const groupSet = new Set();
+        data.forEach(entry => {
+          if (entry.classification?.group) {
+            groupSet.add(entry.classification.group);
+          }
+        });
+        setGroups(Array.from(groupSet).sort());
+      })
+      .catch(err => console.error("Fehler beim Laden der Gruppen:", err));
+  }, []);
+
   return (
-    <div className="flex flex-wrap gap-2 mb-4">
-      {groups.map((group) => (
-        <button
-          key={group}
-          className={`px-3 py-1 rounded-full border 
-            ${selectedGroup === group ? "bg-blue-600 text-white" : "bg-white/10 text-gray-300"} 
-            hover:bg-blue-500 transition`}
-          onClick={() => onSelectGroup(group)} // 🆕 Bei Klick Gruppe ändern
-        >
-          {group}
-        </button>
-      ))}
+    <div className="mb-6">
+      <h2 className="text-sm font-semibold mb-2 text-white/80">Strukturgruppe wählen:</h2>
+      <div className="flex flex-wrap gap-2">
+        {groups.map(group => (
+          <button
+            key={group}
+            onClick={() => onSelectGroup(group)}
+            className={`px-3 py-1 rounded text-sm transition
+              ${selectedGroup === group
+                ? 'bg-brand-blue text-black'
+                : 'bg-white/10 hover:bg-white/20 text-white/80'}`}
+          >
+            {group}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

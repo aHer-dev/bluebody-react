@@ -1,12 +1,10 @@
 // src/App.jsx
 import React, { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
 import CanvasWrapper from "./components/CanvasWrapper";
 import Sidebar from "./components/ui/Sidebar";
 import GroupSelector from "./components/GroupSelector";
 import BentoGrid from "./components/BentoGrid";
 import InfoPanel from "./components/ui/InfoPanel";
-import ModelViewer from "./components/ModelViewer";
 
 export default function App() {
 
@@ -68,14 +66,17 @@ export default function App() {
     }
   }, [selectedGroup, selectedEntry, metaData]);
   console.log("🧪 Modell-Daten:", selectedEntry?.model);
-
   return (
+    
     <div className="flex w-screen h-screen bg-ui-bg text-white">
+
+
       <Sidebar>
         <GroupSelector
           selectedGroup={selectedGroup}
           onSelectGroup={setSelectedGroup}
         />
+
         <BentoGrid
           metaData={metaData}
           selectedGroup={selectedGroup}
@@ -83,17 +84,12 @@ export default function App() {
         />
       </Sidebar>
 
-      <div className="flex-1 h-full relative">
-        <Canvas
-          camera={{ position: [0, 0, 5], fov: 45 }}
-          style={{ width: "100%", height: "100%" }}
-        >
-          <ambientLight intensity={1} />
-          <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ModelViewer url="/models/muscles/FJ1383.glb" />
-        </Canvas>
-
-        
+      <div className="flex-1 relative">
+        {selectedEntry && selectedEntry.model && (
+          <CanvasWrapper
+            modelUrl={`/models/${selectedEntry.model.variants[selectedEntry.model.current].path}/${selectedEntry.model.variants[selectedEntry.model.current].filename}`}
+          />
+        )}
         <InfoPanel
           selectedEntry={selectedEntry}
           onClose={() => setSelectedEntry(null)}
