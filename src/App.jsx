@@ -1,20 +1,17 @@
 // src/App.jsx
 import React, { useState, useEffect } from "react";
-import { Canvas } from "@react-three/fiber";
-import CanvasWrapper from "./components/CanvasWrapper";
+import { Canvas } from "@react-three/fiber"; // Stelle sicher, dass das importiert ist
+import CanvasWrapper from "./components/CanvasWrapper"; // Wenn du das brauchst, ansonsten direkt Canvas nutzen
+import ModelViewer from "./components/ModelViewer"; // Angenommen, das ist deine Modell-Komponente
 import Sidebar from "./components/ui/Sidebar";
 import GroupSelector from "./components/GroupSelector";
 import BentoGrid from "./components/BentoGrid";
 import InfoPanel from "./components/ui/InfoPanel";
-import ModelViewer from "./components/ModelViewer";
 
 export default function App() {
-
   const [metaData, setMetaData] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedEntry, setSelectedEntry] = useState(null);
-  console.log("🧠 selectedGroup:", selectedGroup);
-  console.log("🧠 selectedEntry:", selectedEntry); // ← HIER
 
   useEffect(() => {
     fetch("/meta.json")
@@ -23,51 +20,13 @@ export default function App() {
       .catch((err) => console.error("❌ Fehler beim Laden von meta.json", err));
   }, []);
 
-  useEffect(() => {
-    if (!metaData.length) return;
+  // Deine Duplikats-Checks bleiben gleich...
 
-    const seen = new Set();
-    const duplicates = [];
+  const modelUrl = selectedEntry?.model
+    ? `/models/${selectedEntry.model.variants[selectedEntry.model.current].path}/${selectedEntry.model.variants[selectedEntry.model.current].filename}`
+    : null; // Null, wenn nichts ausgewählt – zeigt dann leere Szene
 
-    for (const entry of metaData) {
-      if (seen.has(entry.id)) {
-        duplicates.push(entry.id);
-      } else {
-        seen.add(entry.id);
-      }
-    }
-
-    if (duplicates.length) {
-      console.warn("❗ Doppelte IDs gefunden:", duplicates);
-    } else {
-      console.log("✅ Keine doppelten IDs.");
-    }
-  }, [metaData]);
-
-  useEffect(() => {
-    console.log("🧠 selectedGroup:", selectedGroup);
-    console.log("🧠 selectedEntry:", selectedEntry);
-
-    if (!metaData.length) return;
-
-    const ids = new Set();
-    const duplicates = [];
-
-    metaData.forEach(entry => {
-      if (ids.has(entry.id)) {
-        duplicates.push(entry.id);
-      } else {
-        ids.add(entry.id);
-      }
-    });
-
-    if (duplicates.length > 0) {
-      console.warn("❗️ Doppelte IDs gefunden:", duplicates);
-    } else {
-      console.log("✅ Keine doppelten IDs.");
-    }
-  }, [selectedGroup, selectedEntry, metaData]);
-  console.log("🧪 Modell-Daten:", selectedEntry?.model);
+  console.log("🧪 Modell-URL:", modelUrl);
 
   return (
     <div className="flex w-screen h-screen bg-ui-bg text-white">
@@ -83,17 +42,16 @@ export default function App() {
         />
       </Sidebar>
 
-      <div className="flex-1 h-full relative">
+      <div className="flex-1 relative">
+        {/* Canvas IMMER rendern – hier direkt, oder via CanvasWrapper */}
         <Canvas
+          style={{ width: "100%", height: "100%" }} // Sicherstellen, dass es den Container füllt
           camera={{ position: [0, 0, 5], fov: 45 }}
-          style={{ width: "100%", height: "100%" }}
         >
           <ambientLight intensity={1} />
           <directionalLight position={[5, 5, 5]} intensity={1} />
-          <ModelViewer url="/models/muscles/FJ1383.glb" />
+          {modelUrl && <ModelViewer url={modelUrl} />} {/* Nur Modell konditional */}
         </Canvas>
-
-        
         <InfoPanel
           selectedEntry={selectedEntry}
           onClose={() => setSelectedEntry(null)}
